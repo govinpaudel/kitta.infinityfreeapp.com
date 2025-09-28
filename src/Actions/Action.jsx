@@ -1,33 +1,24 @@
 import axios from "axios";
 const API_URL = import.meta.env.VITE_PUBLIC_API_URL;
 
-export const getAllOffices = async () => {
-  const res = await axios.get(`${API_URL}/getAllOffices`);
-  console.log(`${API_URL}/getAllOffices`)
+export const getGabisas = async () => {
+  const res = await axios.get(`${API_URL}/getGabisas`);
+  console.log(`${API_URL}/getGabisas`)
   return res;
 };
 
-export const getNapasByOfficeId = async (office_id) => {
-  const res = await axios.get(`${API_URL}/getNapasByOfficeId/${office_id}`);
-  console.log(`${API_URL}/getNapasByOfficeId/${office_id}`)
+export const getWards = async (gabisa_id) => {
+  const res = await axios.get(`${API_URL}/getWards/${gabisa_id}`);
+  console.log(`${API_URL}/getWards/${gabisa_id}`)
   return res;
 };
 
-export const getGabisasByNapaId = async (office_id,napa_id) => {
-  const res = await axios.get(`${API_URL}/getGabisasByNapaId/${office_id}/${napa_id}`);
-  console.log(`${API_URL}/getGabisasByNapaId/${office_id}/${napa_id}`)
+export const getDetailsByKittaNo = async (gabisa_id,ward_no,kitta_no) => {
+  const res = await axios.get(`${API_URL}/getDetailsByKittaNo/${gabisa_id}/${ward_no}/${kitta_no}`);
+  console.log(`${API_URL}/getDetailsByKittaNo/${gabisa_id}/${ward_no}/${kitta_no}`)
   return res;
 };
-export const getWardsByGabisaId = async (office_id,napa_id,gabisa_id) => {
-  const res = await axios.get(`${API_URL}/getWardsByGabisaId/${office_id}/${napa_id}/${gabisa_id}`);
-  console.log(`${API_URL}/getWardsByGabisaId/${office_id}/${napa_id}/${gabisa_id}`)
-  return res;
-};
-export const getDetailsByKittaNo = async (office_id,napa_id,gabisa_id,ward_no,kitta_no) => {
-  const res = await axios.get(`${API_URL}/getDetailsByKittaNo/${office_id}/${napa_id}/${gabisa_id}/${ward_no}/${kitta_no}`);
-  console.log(`${API_URL}/getDetailsByKittaNo/${office_id}/${napa_id}/${gabisa_id}/${ward_no}/${kitta_no}`)
-  return res;
-};
+
 export const getDataByDate = async (date) => {
   const res = await axios.get(`http://10.7.33.8:5000/api/bargikaran/getDataByDate/${date}`);
   console.log(`http://10.7.33.8:5000/api/bargikaran/getDataByDate/${date}`);
