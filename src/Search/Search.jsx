@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  checkUser,
   getGabisas, getWards, getDetailsByKittaNo
 } from "../Actions/Action";
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +8,6 @@ import LoadingOverlay from '../Loading/LoadingOverlay';
 
 const Search = () => {
   const navigate = useNavigate();
-
   const [gabisas, setGabisas] = useState([]);
   const [wards, setWards] = useState([]);
   const [gabisa_id, setGabisa_id] = useState(0);
@@ -17,7 +17,8 @@ const Search = () => {
   const [landdetails, setLandDetails] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch Effects
+  // Fetch Effects  
+  useEffect(() => { checkifUserExists(); }, []);
   useEffect(() => { fetchGabisas(); }, []);
   useEffect(() => { if (gabisa_id > 0) fetchWards(gabisa_id); }, [gabisa_id]);
   useEffect(() => {
@@ -29,6 +30,12 @@ const Search = () => {
     }
   }, [gabisa_id, ward_no, kitta_no]);
 
+  const checkifUserExists = async () => {
+    const check = await checkUser();
+    if (!check) {
+      navigate("/login");
+    }
+  }
   const fetchGabisas = async () => {
     setLoading(true);
     const res = await getGabisas()
@@ -50,8 +57,6 @@ const Search = () => {
       setOwnerDetails(res.data.data);
       setLandDetails(res.data.data1)
     }
-
-
     setLoading(false);
   };
 
@@ -59,12 +64,6 @@ const Search = () => {
     <section className="container my-4">
       <LoadingOverlay loading={loading} message="कृपया प्रतिक्षा गर्नुहोस्..." />
       <h4 className="text-success text-center mb-3">कित्ता कसको नाउँमा छ हेर्नुहोस्</h4>
-      <div className="text-start mb-3">
-        <button className="btn btn-secondary" onClick={() => navigate("/")}>
-          ← गृह पृष्ठमा जानुहोस्
-        </button>
-      </div>
-
       {/* Form Fields */}
       <div className="row g-3 mb-4">
         <div className="col-12 col-md">
@@ -115,7 +114,7 @@ const Search = () => {
               <th>जग्गाधनीको नाम</th>
               <th>बाबु / पतिको नाम</th>
               <th>बाजे / ससुराको नाम</th>
-              <th>ठेगाना</th>              
+              <th>ठेगाना</th>
             </tr>
           </thead>
           <tbody>
@@ -138,7 +137,7 @@ const Search = () => {
             <tr>
               <th>गा.वि.स.</th>
               <th>वडा नं</th>
-              <th>कित्ता नं</th>              
+              <th>कित्ता नं</th>
               <th>किसिम</th>
               <th>प्रकार</th>
               <th>विरह</th>

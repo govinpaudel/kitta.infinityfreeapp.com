@@ -1,15 +1,29 @@
 import { useNavigate } from 'react-router-dom';
-import { getDataByDate, sendRecordsToServer } from '../Actions/Action';
+import { checkUser,getCookiebyUser,getDataByDate, sendRecordsToServer } from '../Actions/Action';
 import { toast } from "react-toastify";
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import LoadingOverlay from '../Loading/LoadingOverlay';
 
 const Admin = () => {
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
+  const [username,setUsername]=useState("");
+  const [password,setPassword]=useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [failedRecords, setFailedRecords] = useState([]); // new state
+
+  const checkifUserExists = async () => {
+      const check = await checkUser();
+      if (!check) {
+        navigate("/login");
+      }
+    }
+  useEffect(
+      () => {
+        checkifUserExists();
+      }, []
+    )
 
   const handleUpload = async () => {
     if (records.length === 0) {
@@ -38,20 +52,17 @@ const Admin = () => {
     }
   };
 
-  const handleDownload = async () => {
-    if (!selectedDate) {
-      toast.warning("कृपया मिति चयन गर्नुहोस् ।");
+  const handleLogin = async () => {
+    if (!username || !password) {
+      toast.warning("कृपया प्रयोगकर्ता र पासवर्ड प्रविष्ट गर्नुहोस् ।");
       return;
     }
     try {
       setLoading(true);
       setRecords([]); // clear existing data
       setFailedRecords([]); // clear failed list
-      const response = await getDataByDate(selectedDate);
-      setRecords(response.data.data || []);
-      if (response.data.data?.length === 0) {
-        toast.info("कुनै पनि डेटा फेला परेन ।");
-      }
+      const response = await getCookiebyUser(username,password);
+      console.log(response);
     } catch (err) {
       toast.error("डेटा ल्याउन असफल भयो");
     } finally {
@@ -59,6 +70,9 @@ const Admin = () => {
     }
   };
 
+  const handleDownload=async()=>{
+
+  }
   return (
     <div className="container mt-5 position-relative">
       {loading && <LoadingOverlay loading={loading} />}
@@ -68,7 +82,7 @@ const Admin = () => {
         <div className="col-md-10">
           <div className="card shadow">
             <div className="card-body d-flex justify-content-between align-items-center">
-              <h4 className="mb-0">Admin Dashboard</h4>
+              <h4 className="mb-0">सर्भरबाट डाटा तान्नुहोस्</h4>
             </div>
           </div>
         </div>
@@ -76,6 +90,29 @@ const Admin = () => {
 
       {/* Date Picker + Button */}
       <div className="row mt-4">
+        <div className="col-md-4 d-flex">
+          <input
+            type="text"
+            className="form-control me-2"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder='username'
+          />
+          </div>
+          <div className="col-md-4 d-flex">
+          <input
+            type="password"
+            className="form-control me-2"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder='password'
+          />
+        </div>
+        <div className="col-md-4 d-flex">
+         <button className="btn btn-primary me-2" onClick={handleLogin} disabled={loading}>
+            Login and get Cookie
+          </button>
+        </div>
         <div className="col-md-6 d-flex">
           <input
             type="date"
