@@ -11,6 +11,12 @@ export const checkUser = async () => {
   }
 }
 
+export const createMaster = async () => {
+  const res = await axios.post(`${API_URL}/createMaster`, {});
+  return res;
+}
+
+
 export const loginUser = async (data) => {
   const res = await axios.post(`${API_URL}/login`, data, {
     headers: {
@@ -41,57 +47,31 @@ export const getDetailsByKittaNo = async (gabisa_id, ward_no, kitta_no) => {
 };
 
 export const getCookiebyUser = async (username, password) => {
-  const form = new URLSearchParams({
+  const data = {
     hidBioDataForUser: "",
     txtCapturedFIR: "",
-    j_username: username,
-    j_password: password,
-  });
-  try {
-    const res = await axios.post(
-      "/lrims/lrims/j_spring_security_check",
-      form.toString(),
-      {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        maxRedirects: 0,           // stop at 302
-        validateStatus: () => true // allow 302
-      }
-    );
-
-    console.log("STATUS:", res.status);
-    console.log("HEADERS:", res.headers);
-// Grab JSESSIONID manually
-    const setCookie = res.headers["set-cookie"];
-    if (!setCookie || !setCookie.length) {
-      console.error("❌ No Set-Cookie header found");
-      return;
-    }
-
-    const jsession = setCookie
-      .map(c => c.split(";")[0])
-      .find(c => c.startsWith("JSESSIONID="));
-
-    if (!jsession) {
-      console.error("❌ JSESSIONID not found in Set-Cookie");
-      return;
-    }
-
-    console.log("✅ JSESSIONID:", jsession);
-
-
-  } catch (error) {
-    console.error("❌ Login error:", error.message);
+    username: username,
+    password: password,
   }
+  const res = await axios.post(`http://10.7.33.8:5000/api/bargikaran/getCookiebyUser`, data);
+  console.log(`http://10.7.33.8:5000/api/bargikaran/getCookiebyUser`, data);
+  return res;
 }
 
+export const getGabisaList = async () => {
+  const res = await axios.get(`http://10.7.33.8:5000/api/bargikaran/getGabisalist`);
+  console.log(`http://10.7.33.8:5000/api/bargikaran/getGabisalist`);
+  return res;
+};
 
-export const getDataByDate = async (date) => {
-  const res = await axios.get(`http://10.7.33.8:5000/api/bargikaran/getDataByDate/${date}`);
-  console.log(`http://10.7.33.8:5000/api/bargikaran/getDataByDate/${date}`);
+export const getDataByGabisa = async (a,b) => {
+  const res = await axios.get(`http://10.7.33.8:5000/api/bargikaran/getDataByGabisa/${a}/${b}`);
+  console.log(`http://10.7.33.8:5000/api/bargikaran/getDataByGabisa`);
   return res;
 };
 
 export const sendRecordsToServer = async (records) => {
+  console.log(records);
   // Send raw array instead of { records: [...] }
   const res = await axios.post(`${API_URL}/saveRecords`, records, {
     headers: {

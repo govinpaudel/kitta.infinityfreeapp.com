@@ -1,56 +1,30 @@
 import { useNavigate } from 'react-router-dom';
-import { checkUser,getCookiebyUser,getDataByDate, sendRecordsToServer } from '../Actions/Action';
+import { checkUser, createMaster, getCookiebyUser, getGabisaList, getDataByGabisa, sendRecordsToServer } from '../Actions/Action';
 import { toast } from "react-toastify";
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import LoadingOverlay from '../Loading/LoadingOverlay';
+
 
 const Admin = () => {
   const navigate = useNavigate();
-  const [username,setUsername]=useState("");
-  const [password,setPassword]=useState("");
-  const [selectedDate, setSelectedDate] = useState("");
-  const [records, setRecords] = useState([]);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [failedRecords, setFailedRecords] = useState([]); // new state
+  const [gabisa, setGabisas] = useState([]);
+  const [data, setData] = useState([]);
 
   const checkifUserExists = async () => {
-      const check = await checkUser();
-      if (!check) {
-        navigate("/login");
-      }
+    const check = await checkUser();
+    if (!check) {
+      navigate("/login");
     }
+  }
   useEffect(
-      () => {
-        checkifUserExists();
-      }, []
-    )
+    () => {
+      checkifUserExists();
+    }, []
+  )
 
-  const handleUpload = async () => {
-    if (records.length === 0) {
-      toast.info("No Data to update to server");
-      return;
-    }
-    try {
-      setLoading(true);
-      const response = await sendRecordsToServer(records);
-      if (response.data.status === true) {
-        toast.success(response.data.message);
-        // failed_records check
-        if (response.data.failed_count > 0) {
-          setFailedRecords(response.data.failed_records || []);
-          toast.error(
-            `${response.data.failed_count} records failed to update. Check table below.`
-          );
-        } else {
-          setFailedRecords([]);
-        }
-      }
-    } catch (err) {
-      toast.error("अपडेट गर्न असफल भयो");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -59,10 +33,11 @@ const Admin = () => {
     }
     try {
       setLoading(true);
-      setRecords([]); // clear existing data
-      setFailedRecords([]); // clear failed list
-      const response = await getCookiebyUser(username,password);
-      console.log(response);
+      const response = await getCookiebyUser(username, password);
+      if (response.data.status = true) {
+        toast.success(response.data.message);
+        sessionStorage.setItem('cookie', response.data.data)
+      }
     } catch (err) {
       toast.error("डेटा ल्याउन असफल भयो");
     } finally {
@@ -70,9 +45,43 @@ const Admin = () => {
     }
   };
 
-  const handleDownload=async()=>{
-
+  const handleDownloadgabisa = async () => {
+    const res = await getGabisaList();
+    setGabisas(res.data.data);
+    console.log(res);
   }
+  const createmaster = async () => {
+    const res = await createMaster();
+    if (res.data.status == true) {
+      toast.success(res.data.message)
+    }
+  }
+
+  const updateToServer = async () => {
+    if (data.length == 0) {
+      toast.warning('कुनै पनि डाटा छैन');
+      return;
+    }
+    const res = await sendRecordsToServer(data);
+    if (res.data.status == true) {
+      toast.success(res.data.message)
+    }
+  }
+
+  const getdata = async (a) => {
+    const b = sessionStorage.getItem('cookie');
+    if (!b) {
+      toast.warning('लगईन भएको छैन ।')
+      return;
+    }
+    const res = await getDataByGabisa(a, b);
+    if (res.status = true) {
+      setData(res.data.data);
+      toast.success(`जम्मा ${res.data.data.length} डाटा प्राप्त भयो`)
+    }
+    console.log(res);
+  }
+
   return (
     <div className="container mt-5 position-relative">
       {loading && <LoadingOverlay loading={loading} />}
@@ -85,10 +94,17 @@ const Admin = () => {
               <h4 className="mb-0">सर्भरबाट डाटा तान्नुहोस्</h4>
             </div>
           </div>
+          <button className="btn btn-primary me-2" onClick={createmaster} disabled={loading}>
+            मास्टर तयार गर्नुहोस्
+          </button>
+          <button className="btn btn-primary me-2" onClick={handleDownloadgabisa} disabled={loading}>
+            गा.वि.स लिष्ट ल्याउनुहोस्
+          </button>
         </div>
+
       </div>
 
-      {/* Date Picker + Button */}
+      {/* Form starts */}
       <div className="row mt-4">
         <div className="col-md-4 d-flex">
           <input
@@ -98,8 +114,8 @@ const Admin = () => {
             onChange={(e) => setUsername(e.target.value)}
             placeholder='username'
           />
-          </div>
-          <div className="col-md-4 d-flex">
+        </div>
+        <div className="col-md-4 d-flex">
           <input
             type="password"
             className="form-control me-2"
@@ -109,53 +125,40 @@ const Admin = () => {
           />
         </div>
         <div className="col-md-4 d-flex">
-         <button className="btn btn-primary me-2" onClick={handleLogin} disabled={loading}>
+          <button className="btn btn-primary me-2" onClick={handleLogin} disabled={loading}>
             Login and get Cookie
           </button>
         </div>
-        <div className="col-md-6 d-flex">
-          <input
-            type="date"
-            className="form-control me-2"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-          />
-          <button className="btn btn-primary me-2" onClick={handleDownload} disabled={loading}>
-            Download Data
-          </button>
-          <button className="btn btn-primary" onClick={handleUpload} disabled={loading}>
-            Update to remote
-          </button>
-        </div>
       </div>
-
+      {/* Form Ends */}
       {/* Table - Downloaded Records */}
       <div className="row mt-4">
         <div className="col-md-12">
-          <h5>Downloaded Records</h5>
+          <h5>गा.वि.स हरुको लिष्ट</h5>
           <table className="table table-bordered table-striped">
             <thead className="table-dark">
               <tr>
-                <th>Office</th>
-                <th>Napa</th>
-                <th>Gabisa</th>
-                <th>Ward</th>
-                <th>Kitta No</th>
-                <th>Bargikaran</th>
-                <th>Remarks</th>
+                <th>Gabisa ID</th>
+                <th>Gabisa Name</th>
+                <th>गा.वि.सको नाम</th>
+                <th colSpan={2}>कृयाकलाप</th>
               </tr>
             </thead>
             <tbody>
-              {records.length > 0 ? (
-                records.map((row, index) => (
+              {gabisa.length > 0 ? (
+                gabisa.map((row, index) => (
                   <tr key={index}>
-                    <td>{row.office_name}</td>
-                    <td>{row.napa_name}</td>
-                    <td>{row.gabisa_name}</td>
-                    <td>{row.ward_no}</td>
-                    <td>{row.kitta_no}</td>
-                    <td>{row.bargikaran}</td>
-                    <td>{row.remarks}</td>
+                    <td>{row[0]}</td>
+                    <td>{row[1]}</td>
+                    <td>{row[2]}</td>
+                    <td><button onClick={() => {
+                      getdata(row[0], row[1], row[2])
+                    }} className='btn btn-sm btn-info' >Download</button></td>
+                    <td>
+                      <button className="btn btn-primary me-2" onClick={updateToServer} disabled={loading}>
+                        Update To Server
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -169,43 +172,6 @@ const Admin = () => {
           </table>
         </div>
       </div>
-
-      {/* Table - Failed Records */}
-      {failedRecords.length > 0 && (
-        <div className="row mt-4">
-          <div className="col-md-12">
-            <h5 className="text-danger">Failed Records</h5>
-            <table className="table table-bordered table-striped">
-              <thead className="table-danger">
-                <tr>
-                  <th>Office</th>
-                  <th>Napa</th>
-                  <th>Gabisa</th>
-                  <th>Ward</th>
-                  <th>Kitta No</th>
-                  <th>Bargikaran</th>
-                  <th>Remarks</th>
-                  <th>Reason</th>
-                </tr>
-              </thead>
-              <tbody>
-                {failedRecords.map((f, index) => (
-                  <tr key={index}>
-                    <td>{f.record.office_name}</td>
-                    <td>{f.record.napa_name}</td>
-                    <td>{f.record.gabisa_name}</td>
-                    <td>{f.record.ward_no}</td>
-                    <td>{f.record.kitta_no}</td>
-                    <td>{f.record.bargikaran}</td>
-                    <td>{f.record.remarks}</td>
-                    <td className="text-danger">{f.reason}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
