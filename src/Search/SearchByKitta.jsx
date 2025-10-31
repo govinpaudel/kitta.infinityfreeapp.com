@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import {
-  checkUser,
+import {  
   getGabisas, getWards, getDetailsByKittaNo
 } from "../Actions/Action";
 import { useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../Loading/LoadingOverlay';
 
-const Search = () => {
+const SearchByKitta = () => {
   const navigate = useNavigate();
   const [gabisas, setGabisas] = useState([]);
   const [wards, setWards] = useState([]);
@@ -18,7 +17,6 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
 
   // Fetch Effects  
-  useEffect(() => { checkifUserExists(); }, []);
   useEffect(() => { fetchGabisas(); }, []);
   useEffect(() => { if (gabisa_id > 0) fetchWards(gabisa_id); }, [gabisa_id]);
   useEffect(() => {
@@ -29,13 +27,7 @@ const Search = () => {
       return () => clearTimeout(timer);
     }
   }, [gabisa_id, ward_no, kitta_no]);
-
-  const checkifUserExists = async () => {
-    const check = await checkUser();
-    if (!check) {
-      navigate("/login");
-    }
-  }
+  
   const fetchGabisas = async () => {
     setLoading(true);
     const res = await getGabisas()
@@ -63,10 +55,14 @@ const Search = () => {
   return (
     <section className="container my-4">
       <LoadingOverlay loading={loading} message="कृपया प्रतिक्षा गर्नुहोस्..." />
-      <h4 className="text-success text-center mb-3">कित्ता कसको नाउँमा छ हेर्नुहोस्</h4>
+      <button className='btn btn-primary' onClick={()=>{navigate("/dashboard")}}>पछाडी जानुहोस् ।</button>
+      <h4 className="text-success text-center mb-3">जग्गा विवरण बाट खोज्नुहोस् ।</h4>
       {/* Form Fields */}
       <div className="row g-3 mb-4">
         <div className="col-12 col-md">
+
+       
+
           <select
             className="form-select"
             value={gabisa_id}
@@ -111,6 +107,7 @@ const Search = () => {
           <thead className="table-light">
             <tr>
               <th>नागरिकता नं</th>
+              <th>जारी मितिः</th>
               <th>जग्गाधनीको नाम</th>
               <th>बाबु / पतिको नाम</th>
               <th>बाजे / ससुराको नाम</th>
@@ -121,6 +118,7 @@ const Search = () => {
             {ownerdetails.map((i, index) => (
               <tr key={index}>
                 <td>{i.citizenship_no}</td>
+                <td>{i.idissuedate}</td>
                 <td>{i.owner_name}</td>
                 <td>{i.fatherhusbandname}</td>
                 <td>{i.grandfatherdname}</td>
@@ -167,4 +165,4 @@ const Search = () => {
   );
 };
 
-export default Search;
+export default SearchByKitta;

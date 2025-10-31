@@ -1,16 +1,6 @@
 import axios from "axios";
 const API_URL = import.meta.env.VITE_PUBLIC_API_URL;
 
-export const checkUser = async () => {
-  const user = sessionStorage.getItem('user');
-  if (user) {
-    return true;
-  }
-  else {
-    return false;
-  }
-}
-
 export const createMaster = async () => {
   const res = await axios.post(`${API_URL}/createMaster`, {});
   return res;
@@ -46,27 +36,34 @@ export const getDetailsByKittaNo = async (gabisa_id, ward_no, kitta_no) => {
   return res;
 };
 
-export const getCookiebyUser = async (username, password) => {
+export const getDetailsByOwner = async (citizenship_no, idissuedate) => {
+  const res = await axios.get(`${API_URL}/getDetailsByOwner/${citizenship_no}/${idissuedate}`);
+  console.log(`${API_URL}/getDetailsByOwner/${citizenship_no}/${idissuedate}`)
+  return res;
+};
+
+
+export const getCookiebyUser = async (username, password,ipaddress) => {
   const data = {
     hidBioDataForUser: "",
     txtCapturedFIR: "",
     username: username,
     password: password,
   }
-  const res = await axios.post(`http://10.7.33.8:5000/api/bargikaran/getCookiebyUser`, data);
-  console.log(`http://10.7.33.8:5000/api/bargikaran/getCookiebyUser`, data);
+  const res = await axios.post(`http://${ipaddress}:5000/api/bargikaran/getCookiebyUser`, data);
+  console.log(`http://${ipaddress}:5000/api/bargikaran/getCookiebyUser`, data);
   return res;
 }
 
-export const getGabisaList = async () => {
-  const res = await axios.get(`http://10.7.33.8:5000/api/bargikaran/getGabisalist`);
-  console.log(`http://10.7.33.8:5000/api/bargikaran/getGabisalist`);
+export const getGabisaList = async (ipaddress) => {
+  const res = await axios.get(`http://${ipaddress}:5000/api/bargikaran/getGabisalist`);
+  console.log(`http://${ipaddress}:5000/api/bargikaran/getGabisalist`);
   return res;
 };
 
-export const getDataByGabisa = async (a,b) => {
-  const res = await axios.get(`http://10.7.33.8:5000/api/bargikaran/getDataByGabisa/${a}/${b}`);
-  console.log(`http://10.7.33.8:5000/api/bargikaran/getDataByGabisa`);
+export const getDataByGabisa = async (a,b,ipaddress) => {
+  const res = await axios.get(`http://${ipaddress}:5000/api/bargikaran/getDataByGabisa/${a}/${b}`);
+  console.log(`http://${ipaddress}:5000/api/bargikaran/getDataByGabisa`);
   return res;
 };
 
