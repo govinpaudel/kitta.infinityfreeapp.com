@@ -9,7 +9,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [ipaddress, setIpaddress] = useState("");
+  const [ipaddress, setIpaddress] = useState("100.97.198.62");
   const [cookie, setCookie] = useState("");
   const [loading, setLoading] = useState(false);
   const [gabisa, setGabisa] = useState([]);
@@ -26,6 +26,7 @@ const Admin = () => {
       if (response.data.status = true) {
         toast.success(response.data.message);
         sessionStorage.setItem('cookie', response.data.data)
+        sessionStorage.setItem('ipaddress',ipaddress)
         setCookie(response.data.data);
       }
     } catch (err) {

@@ -8,6 +8,7 @@ import SearchByOwner from './Search/SearchByOwner';
 import Dashboard from './Dashboard/Dashboard';
 import Logout from './Logout/Logout';
 import ProtectedRoute from './ProtectedRoute/ProtectedRoute';
+import SearchByOwnerServer from './Search/SearchByOwnerServer';
 function App() { 
   return (
     <Router>
@@ -26,6 +27,10 @@ function App() {
       <Route
         path="/searchbyowner"
         element={<ProtectedRoute element={<SearchByOwner />} />}
+      />
+      <Route
+        path="/searchbyownerserver"
+        element={<ProtectedRoute element={<SearchByOwnerServer/>} />}
       />
       <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
       <Route path="/logout" element={<ProtectedRoute element={<Logout />} />} />

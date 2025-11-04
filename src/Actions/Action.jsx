@@ -67,7 +67,13 @@ export const getDataByGabisa = async (a,b,ipaddress) => {
   return res;
 };
 
-export const sendRecordsToServer = async (records) => {
+export const getDetailsByOwnerServer = async(data)=>{
+  const res =await axios.post(`http://${data.ipaddress}:5000/api/bargikaran/getDataById`,data);
+  console.log(`http://${data.ipaddress}:5000/api/bargikaran/getDataById`,data);
+  return res;
+}
+
+export const sendRecordsToServer = async (records) => {`http://${data.ipaddress}:5000/api/bargikaran/getDataByGabisa`,data
   console.log(records);
   // Send raw array instead of { records: [...] }
   const res = await axios.post(`${API_URL}/saveRecords`, records, {

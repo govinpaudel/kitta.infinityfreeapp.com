@@ -5,9 +5,14 @@ const Dashboard = () => {
   return (
     <div className="container text-center">
         <table className='table table-sm'>
-            <thead><tr>
+            <thead>
+                <tr>
                 <th><button className='btn btn-primary btn-lg' onClick={()=>navigate("/searchbykitta")}>जग्गा प्रतिवेदन</button></th>
                 <th><button className='btn btn-primary btn-lg' onClick={()=>navigate("/searchbyowner")}>व्यक्ती प्रतिवेदन</button></th>
+            </tr>
+            <tr>
+                <th><button className='btn btn-primary btn-lg' onClick={()=>navigate("/searchbykittaserver")}>जग्गा प्रतिवेदन सर्भर</button></th>
+                <th><button className='btn btn-primary btn-lg' onClick={()=>navigate("/searchbyownerserver")}>व्यक्ती प्रतिवेदन सर्भर</button></th>
             </tr>
             <tr>
                 <th><button className='btn btn-primary btn-lg' onClick={()=>navigate("/admin")}>एडमिन प्यानल</button></th>
