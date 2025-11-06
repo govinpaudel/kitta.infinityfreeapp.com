@@ -80,22 +80,26 @@ const Admin = () => {
     setLoading(false);
   }
 
-  const getdata = async (a) => {
-    console.log(a);
+  const getdata = async (gabisa_id) => {    
     setLoading(true);
-    const b = sessionStorage.getItem('cookie');
-    if (!b) {
+    const cookie = sessionStorage.getItem('cookie');
+    if (!cookie) {
       toast.warning('लगईन भएको छैन ।')
       return;
     }
-    const res = await getDataByGabisa(a, b, ipaddress);
+    const data={
+      gabisa_id:gabisa_id,
+      cookie:cookie,
+      ipaddress:ipaddress
+    }
+    const res = await getDataByGabisa(data);
 
     if (res.data.status == true) {
       setData(res.data.data);
       toast.success(`जम्मा ${res.data.data.length} डाटा प्राप्त भयो`);
       setGabisa(prevGabisa =>
         prevGabisa.map(row =>
-          row[0] === a ? { ...row, 3: 'Y' } : row
+          row[0] === gabisa_id ? { ...row, 3: 'Y' } : row
         )
       );
     }

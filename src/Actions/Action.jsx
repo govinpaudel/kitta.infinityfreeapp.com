@@ -50,26 +50,32 @@ export const getCookiebyUser = async (username, password,ipaddress) => {
     username: username,
     password: password,
   }
-  const res = await axios.post(`http://${ipaddress}:5000/api/bargikaran/getCookiebyUser`, data);
-  console.log(`http://${ipaddress}:5000/api/bargikaran/getCookiebyUser`, data);
+  const res = await axios.post(`http://${ipaddress}:5000/api/lrims/getCookiebyUser`, data);
+  console.log(`http://${ipaddress}:5000/api/lrims/getCookiebyUser`, data);
   return res;
 }
 
 export const getGabisaList = async (ipaddress) => {
-  const res = await axios.get(`http://${ipaddress}:5000/api/bargikaran/getGabisalist`);
-  console.log(`http://${ipaddress}:5000/api/bargikaran/getGabisalist`);
+  const res = await axios.get(`http://${ipaddress}:5000/api/lrims/getGabisalist`);
+  console.log(`http://${ipaddress}:5000/api/lrims/getGabisalist`);
   return res;
 };
 
-export const getDataByGabisa = async (a,b,ipaddress) => {
-  const res = await axios.get(`http://${ipaddress}:5000/api/bargikaran/getDataByGabisa/${a}/${b}`);
-  console.log(`http://${ipaddress}:5000/api/bargikaran/getDataByGabisa`);
+export const getDataByGabisa = async (data) => {
+  const res = await axios.post(`http://${data.ipaddress}:5000/api/lrims/getDataByGabisa`,data);
+  console.log(`http://${data.ipaddress}:5000/api/lrims/getDataByGabisa`,data);
   return res;
 };
 
 export const getDetailsByOwnerServer = async(data)=>{
-  const res =await axios.post(`http://${data.ipaddress}:5000/api/bargikaran/getDataById`,data);
-  console.log(`http://${data.ipaddress}:5000/api/bargikaran/getDataById`,data);
+  const res =await axios.post(`http://${data.ipaddress}:5000/api/lrims/getDataById`,data);
+  console.log(`http://${data.ipaddress}:5000/api/lrims/getDataById`,data);
+  return res;
+}
+
+export const getLandByOwnerServer = async(data)=>{
+  const res =await axios.post(`http://${data.ipaddress}:5000/api/lrims/getLandById`,data);
+  console.log(`http://${data.ipaddress}:5000/api/lrims/getLandById`,data);
   return res;
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  getDetailsByOwnerServer
+  getDetailsByOwnerServer,getLandByOwnerServer
 } from "../Actions/Action";
 import { useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../Loading/LoadingOverlay';
@@ -28,18 +28,34 @@ const SearchByOwnerServer = () => {
     }
   }, [citizenship_no, idissuedate, district_id]);
 
+  const fetchland = async (id) => {
+    console.log(id);
+    setLoading(true);
+    const data = {
+      contactid: id,      
+      cookie: sessionStorage.getItem('cookie'),
+      ipaddress: sessionStorage.getItem('ipaddress')
+    }
+    const res = await getLandByOwnerServer(data);
+    if (res) {
+      console.log(res.data.data);
+      setLanddetails(res.data.data.propertydetails);
+    }
+    setLoading(false);
+  }
 
   const fetchDetails = async (citizenship_no, idissuedate, district_id) => {
     setLoading(true);
-    const data={
-      citizenship_no:citizenship_no,
-      idissuedate:idissuedate.replaceAll("-","/"),
-      district_id:district_id,
-      cookie:sessionStorage.getItem('cookie'),
-      ipaddress:sessionStorage.getItem('ipaddress')
+    const data = {
+      citizenship_no: citizenship_no,
+      idissuedate: idissuedate.replaceAll("-", "/"),
+      district_id: district_id,
+      cookie: sessionStorage.getItem('cookie'),
+      ipaddress: sessionStorage.getItem('ipaddress')
     }
     const res = await getDetailsByOwnerServer(data);
     if (res) {
+      console.log(res.data.data);
       setOwnerDetails(res.data.data);
     }
     setLoading(false);
@@ -90,17 +106,19 @@ const SearchByOwnerServer = () => {
               <th>बाबु / पतिको नाम</th>
               <th>बाजे / ससुराको नाम</th>
               <th>ठेगाना</th>
+              <th>कृयाकलाप</th>
             </tr>
           </thead>
           <tbody>
             {ownerdetails.map((i, index) => (
               <tr key={index}>
-                <td>{i.citizenship_no}</td>
+                <td>{i.idno}</td>
                 <td>{i.idissuedate}</td>
-                <td>{i.owner_name}</td>
-                <td>{i.fatherhusbandname}</td>
-                <td>{i.grandfatherdname}</td>
-                <td>{i.owneraddress}</td>
+                <td>{i.firstname} {i.middlename} {i.lastname}</td>
+                <td>{i.fatherfirstname}{i.fathermiddlename}{i.fatherlastname}</td>
+                <td>{i.grandfatherfirstname}{i.grandfathermiddlename}{i.grandfatherlastname}</td>
+                <td>{i.municipalityvdcname_np}</td>
+                <td><button className='btn btn-sm btn-info' onClick={() => fetchland(i.contactid)}>श्रेष्ता हेर्नुहोस्</button></td>
               </tr>
             ))}
 
