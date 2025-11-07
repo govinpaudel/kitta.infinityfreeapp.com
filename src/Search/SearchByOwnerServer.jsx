@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  getDetailsByOwnerServer,getLandByOwnerServer
+  getDetailsByOwnerServer, getLandByOwnerServer
 } from "../Actions/Action";
 import { useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../Loading/LoadingOverlay';
@@ -8,7 +8,7 @@ import districts from './distdata';
 const SearchByOwnerServer = () => {
   const navigate = useNavigate();
   const [citizenship_no, setCitizenship_no] = useState([]);
-  const [idissuedate, setIdissuedate] = useState(0);
+  const [idissuedate, setIdissuedate] = useState([]);
   const [district_id, setDistrict_id] = useState([]);
   const [ownerdetails, setOwnerDetails] = useState([]);
   const [landdetails, setLanddetails] = useState([]);
@@ -16,8 +16,35 @@ const SearchByOwnerServer = () => {
   const [total, setTotal] = useState('0-0-0-0');
   const [totsqm, setTotsqm] = useState(0);
 
-  // Fetch Effects 
+  function calculateArea(data) {
+    console.log("summing area");
+    setTotal('0-0-0-0');
+    setTotsqm(0);
+    let totalSqm = 0;
+    let totdaam = 0;
+    if (data.length > 0) {
+      data.forEach((land) => {
+        const sqm = parseFloat(land.area5); // convert string to number
+        totalSqm += sqm; // add to total
+        setTotsqm(totalSqm);
+        const value = land.area4 + land.area3 * 4 + land.area2 * 4 * 4 + land.area1 * 16 * 4 * 4;
+        totdaam += value;
+      });
+      console.log(totdaam);
+      let daam = totdaam % 4; // remcainder after converting to paisa
+      let totalPaisa = Math.floor(totdaam / 4);
 
+      let paisa = totalPaisa % 4; // remainder after converting to aana
+      let totalAana = Math.floor(totalPaisa / 4);
+
+      let aana = totalAana % 16; // remainder after converting to ropani
+      let ropani = Math.floor(totalAana / 16);
+      console.log(`${ropani}-${aana}-${paisa}-${daam}`)
+      setTotal(`${ropani}-${aana}-${paisa}-${daam}`);
+
+    }
+  }
+  // Fetch Effects 
   useEffect(() => {
     console.log(citizenship_no, idissuedate, district_id)
     if (citizenship_no.length > 0 && idissuedate.length > 0 && district_id > 0) {
@@ -32,14 +59,33 @@ const SearchByOwnerServer = () => {
     console.log(id);
     setLoading(true);
     const data = {
-      contactid: id,      
+      contactid: id,
       cookie: sessionStorage.getItem('cookie'),
       ipaddress: sessionStorage.getItem('ipaddress')
     }
     const res = await getLandByOwnerServer(data);
     if (res) {
-      console.log(res.data.data);
-      setLanddetails(res.data.data.propertydetails);
+      console.log(res.data.data.propertydetails);
+      const sortedData = [...res.data.data.propertydetails].sort((a, b) => {
+        // Compare by muncname_np (string)
+        const muncCompare = a.muncname_np.localeCompare(b.muncname_np);
+        if (muncCompare !== 0) return muncCompare;
+
+        // Compare by wardnumber (numeric)
+        const wardCompare = Number(a.wardnumber) - Number(b.wardnumber);
+        if (wardCompare !== 0) return wardCompare;
+
+        // Compare by presentparcleno (string or number)
+        if (typeof a.presentparcleno === "number" && typeof b.presentparcleno === "number") {
+          return a.presentparcleno - b.presentparcleno;
+        } else {
+          return String(a.presentparcleno).localeCompare(String(b.presentparcleno));
+        }
+      });
+      // Now set the sorted array into state
+      setLanddetails(sortedData);
+      calculateArea(res.data.data.propertydetails);
+
     }
     setLoading(false);
   }
@@ -85,7 +131,7 @@ const SearchByOwnerServer = () => {
             placeholder='2065/12/10' />
         </div>
         <div className="col-12 col-md">
-          <select name='district_id' value={district_id} className='form-control' onChange={e => setDistrict_id(e.target.value)}>
+          <select name='district_id' value={district_id ?? ""} className='form-control' onChange={e => setDistrict_id(e.target.value)}>
             {districts.map((d) => (
               <option key={d.id} value={d.id}>
                 {d.name}
@@ -133,6 +179,7 @@ const SearchByOwnerServer = () => {
               <th>गा.वि.स.</th>
               <th>वडा नं</th>
               <th>कित्ता नं</th>
+              <th>हकहिस्सा</th>
               <th>किसिम</th>
               <th>प्रकार</th>
               <th>विरह</th>
@@ -144,20 +191,21 @@ const SearchByOwnerServer = () => {
           <tbody>
             {landdetails.map((i, index) => (
               <tr key={index}>
-                <td>{i.landmunicipalityvdc}</td>
-                <td>{i.wardno}</td>
+                <td>{i.muncname_np}</td>
+                <td>{i.wardnumber}</td>
                 <td>{i.presentparcleno}</td>
-                <td>{i.landtype_np}</td>
+                <td>{i.ownershipsharetypeNp}</td>
+                <td>{i.landtype_Np}</td>
                 <td>{i.classtype_np}</td>
-                <td>{i.landusetype_np}</td>
-                <td>{i.area}</td>
-                <td>{i.mothno}</td>
-                <td>{i.pageno}</td>
+                <td>{i.landusetypeNp}</td>
+                <td>{i.area1}-{i.area2}-{i.area3}-{i.area4}/{i.area5}</td>
+                <td>{i.mothNo}</td>
+                <td>{i.pageNo}</td>
               </tr>
             ))}
             <tr>
-              <td colSpan={6}>जम्मा</td>
-              <td colSpan={3}>{total} / {totsqm} वर्ग मिटर</td>
+              <td colSpan={7}>जम्मा</td>
+              <td colSpan={4}>{total} / {totsqm} वर्ग मिटर</td>
             </tr>
           </tbody>
         </table>
