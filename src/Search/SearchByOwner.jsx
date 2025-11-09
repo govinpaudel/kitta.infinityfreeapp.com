@@ -127,6 +127,7 @@ const SearchByOwner = () => {
         <table className="table table-bordered table-striped">
           <thead className="table-light">
             <tr>
+            <th>क्र.स</th>
               <th>गा.वि.स.</th>
               <th>वडा नं</th>
               <th>कित्ता नं</th>
@@ -141,6 +142,7 @@ const SearchByOwner = () => {
           <tbody>
             {landdetails.map((i, index) => (
               <tr key={index}>
+                <td>{index+1}</td>
                 <td>{i.landmunicipalityvdc}</td>
                 <td>{i.wardno}</td>
                 <td>{i.presentparcleno}</td>
