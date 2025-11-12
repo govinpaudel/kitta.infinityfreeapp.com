@@ -5,11 +5,13 @@ import {
 import { useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../Loading/LoadingOverlay';
 import districts from './distdata';
+import { toast } from "react-toastify";
 const SearchByOwnerServer = () => {
   const navigate = useNavigate();
-  const [citizenship_no, setCitizenship_no] = useState([]);
-  const [idissuedate, setIdissuedate] = useState([]);
-  const [district_id, setDistrict_id] = useState([]);
+  const [first_name, setFirst_name] = useState("");
+  const [citizenship_no, setCitizenship_no] = useState("");
+  const [idissuedate, setIdissuedate] = useState("");
+  const [district_id, setDistrict_id] = useState("");
   const [ownerdetails, setOwnerDetails] = useState([]);
   const [landdetails, setLanddetails] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,25 +46,15 @@ const SearchByOwnerServer = () => {
 
     }
   }
-  // Fetch Effects 
-  useEffect(() => {
-    console.log(citizenship_no, idissuedate, district_id)
-    if (citizenship_no.length > 0 && idissuedate.length > 0 && district_id > 0) {
-      const timer = setTimeout(() => {
-        fetchDetails(citizenship_no, idissuedate, district_id);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [citizenship_no, idissuedate, district_id]);
 
   const fetchland = async (id) => {
-    console.log(id);
     setLoading(true);
     const data = {
       contactid: id,
       cookie: sessionStorage.getItem('cookie'),
       ipaddress: sessionStorage.getItem('ipaddress')
     }
+
     const res = await getLandByOwnerServer(data);
     if (res) {
       console.log(res.data.data.propertydetails);
@@ -90,15 +82,28 @@ const SearchByOwnerServer = () => {
     setLoading(false);
   }
 
-  const fetchDetails = async (citizenship_no, idissuedate, district_id) => {
+  const fetchDetails = async () => {
+    const cookie = sessionStorage.getItem('cookie');
+    const ipaddress = sessionStorage.getItem('ipaddress');
+    if (!cookie || !ipaddress) {
+      toast.warning("खोजिका लागि लगईन गर्नुहोला ।")
+      return;
+    }
+    console.log(citizenship_no, idissuedate, district_id, first_name);
+    if (!citizenship_no && !idissuedate && !district_id && !first_name) {
+      toast.warning("खोजिका लागि कुनै एक चिज प्रविष्ट गर्नुहोस् ")
+      return;
+    }
     setLoading(true);
     const data = {
-      citizenship_no: citizenship_no,
-      idissuedate: idissuedate.replaceAll("-", "/"),
-      district_id: district_id,
-      cookie: sessionStorage.getItem('cookie'),
-      ipaddress: sessionStorage.getItem('ipaddress')
+      first_name: first_name || '',
+      citizenship_no: citizenship_no || '',
+      idissuedate: idissuedate || '',
+      district_id: district_id || '',
+      cookie: sessionStorage.getItem('cookie') || '',
+      ipaddress: sessionStorage.getItem('ipaddress') || ''
     }
+    console.log(data);
     const res = await getDetailsByOwnerServer(data);
     if (res) {
       console.log(res.data.data);
@@ -116,11 +121,19 @@ const SearchByOwnerServer = () => {
       <div className="row g-3 mb-4">
         <div className="col-12 col-md">
           <input type="text"
+            name="first_name"
+            className='form-control'
+            value={first_name}
+            onChange={e => setFirst_name(e.target.value)}
+            placeholder='पहिलो नाम' />
+        </div>
+        <div className="col-12 col-md">
+          <input type="text"
             name="citizenship_no"
             className='form-control'
             value={citizenship_no}
             onChange={e => setCitizenship_no(e.target.value)}
-            placeholder='१२३' />
+            placeholder='ना.प्र.नं' />
         </div>
         <div className="col-12 col-md">
           <input type="text"
@@ -128,7 +141,7 @@ const SearchByOwnerServer = () => {
             className='form-control'
             value={idissuedate}
             onChange={e => setIdissuedate(e.target.value)}
-            placeholder='2065/12/10' />
+            placeholder='जारी मिति' />
         </div>
         <div className="col-12 col-md">
           <select name='district_id' value={district_id ?? ""} className='form-control' onChange={e => setDistrict_id(e.target.value)}>
@@ -139,8 +152,12 @@ const SearchByOwnerServer = () => {
             ))}
           </select>
         </div>
+        <div className="col-12 col-md">
+          <button className='btn btn-sm btn-primary' onClick={(e) => {
+            fetchDetails()
+          }}>खोज्नुहोस्</button>
+        </div>
       </div>
-
       {/* Results Table */}
       <div className="table-responsive mb-3">
         <table className="table table-bordered table-striped">

@@ -43,7 +43,7 @@ export const getDetailsByOwner = async (citizenship_no, idissuedate) => {
 };
 
 
-export const getCookiebyUser = async (username, password,ipaddress) => {
+export const getCookiebyUser = async (username, password, ipaddress) => {
   const data = {
     hidBioDataForUser: "",
     txtCapturedFIR: "",
@@ -62,24 +62,25 @@ export const getGabisaList = async (ipaddress) => {
 };
 
 export const getDataByGabisa = async (data) => {
-  const res = await axios.post(`http://${data.ipaddress}:5000/api/lrims/getDataByGabisa`,data);
-  console.log(`http://${data.ipaddress}:5000/api/lrims/getDataByGabisa`,data);
+  const res = await axios.post(`http://${data.ipaddress}:5000/api/lrims/getDataByGabisa`, data);
+  console.log(`http://${data.ipaddress}:5000/api/lrims/getDataByGabisa`, data);
   return res;
 };
 
-export const getDetailsByOwnerServer = async(data)=>{
-  const res =await axios.post(`http://${data.ipaddress}:5000/api/lrims/getDataById`,data);
-  console.log(`http://${data.ipaddress}:5000/api/lrims/getDataById`,data);
+export const getDetailsByOwnerServer = async (data) => {
+  const res = await axios.post(`http://${data.ipaddress}:5000/api/lrims/getDataById`, data);
+  console.log(`http://${data.ipaddress}:5000/api/lrims/getDataById`, data);
   return res;
 }
 
-export const getLandByOwnerServer = async(data)=>{
-  const res =await axios.post(`http://${data.ipaddress}:5000/api/lrims/getLandById`,data);
-  console.log(`http://${data.ipaddress}:5000/api/lrims/getLandById`,data);
+export const getLandByOwnerServer = async (data) => {
+  const res = await axios.post(`http://${data.ipaddress}:5000/api/lrims/getLandById`, data);
+  console.log(`http://${data.ipaddress}:5000/api/lrims/getLandById`, data);
   return res;
 }
 
-export const sendRecordsToServer = async (records) => {`http://${data.ipaddress}:5000/api/bargikaran/getDataByGabisa`,data
+export const sendRecordsToServer = async (records) => {
+  `http://${data.ipaddress}:5000/api/bargikaran/getDataByGabisa`, data
   console.log(records);
   // Send raw array instead of { records: [...] }
   const res = await axios.post(`${API_URL}/saveRecords`, records, {
